@@ -6,19 +6,26 @@ export default function LanguageSwitcher() {
   const { language, setLanguage } = useLanguage();
 
   return (
-    <div className="flex items-center bg-surface border border-surface-border rounded-full p-1 text-xs font-semibold">
+    <div className="flex items-center rounded-xl border border-white/10 bg-white/5 p-1 text-xs font-semibold backdrop-blur">
       <button
+        type="button"
         onClick={() => setLanguage('en')}
-        className={`px-2.5 py-1 rounded-full transition ${
-          language === 'en' ? 'bg-primary-600 text-white' : 'text-gray-400 hover:text-white'
+        className={`rounded-lg px-2.5 py-1.5 transition ${
+          language === 'en'
+            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
+            : 'text-gray-400 hover:text-white'
         }`}
       >
         EN
       </button>
+
       <button
+        type="button"
         onClick={() => setLanguage('bn')}
-        className={`px-2.5 py-1 rounded-full transition ${
-          language === 'bn' ? 'bg-primary-600 text-white' : 'text-gray-400 hover:text-white'
+        className={`rounded-lg px-2.5 py-1.5 transition ${
+          language === 'bn'
+            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
+            : 'text-gray-400 hover:text-white'
         }`}
       >
         বাংলা

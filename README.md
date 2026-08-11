@@ -1,6 +1,6 @@
-# Arian Islam Nirob — Personal 3D Life Story Portfolio
+# Aryan Islam Nirob — Personal 3D Life Story Portfolio
 
-Production-grade 3D autobiography and interactive memory museum web application built for **Arian Islam Nirob** (Creative Alias: **CrypticX**).
+Production-grade 3D autobiography and interactive memory museum web application built for **Aryan Islam Nirob** (Creative Alias: **CrypticX**).
 
 ## Features
 

@@ -3,12 +3,12 @@ import type { Metadata } from 'next';
 import { LanguageProvider } from '@/context/LanguageContext';
 
 export const metadata: Metadata = {
-  title: 'Arian Islam Nirob | Personal 3D Life Story Portfolio',
+  title: 'Aryan Islam Nirob | Personal 3D Life Story Portfolio',
   description:
-    'Personal digital portfolio and life story of Arian Islam Nirob, featuring memories, experiences, projects, and the CrypticX journey.',
+    'Personal digital portfolio and life story of Aryan Islam Nirob, featuring memories, experiences, projects, and the CrypticX journey.',
   openGraph: {
-    title: 'Arian Islam Nirob | Personal 3D Portfolio',
-    description: 'Explore the digital autobiography and 3D memory museum of Arian Islam Nirob (CrypticX).',
+    title: 'Aryan Islam Nirob | Personal 3D Portfolio',
+    description: 'Explore the digital autobiography and 3D memory museum of Aryan Islam Nirob (CrypticX).',
     type: 'website',
   },
 };

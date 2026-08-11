@@ -4,72 +4,96 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
-import { Menu, X, Compass } from 'lucide-react';
+import { Menu, X, Sparkles } from 'lucide-react';
 
 export default function Navbar() {
   const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
 
   const navLinks = [
-    { href: '#about', label: t('About', 'সম্পর্কে') },
-    { href: '#journey', label: t('Journey', 'পথচলা') },
+    { href: '#about', label: t('About', 'পরিচয়') },
     { href: '#crypticx', label: t('CrypticX', 'ক্রিপ্টিক এক্স') },
+    { href: '#journey', label: t('Journey', 'পথচলা') },
     { href: '#memories', label: t('Memories', 'স্মৃতি') },
     { href: '#albums', label: t('Albums', 'অ্যালবাম') },
     { href: '#experience', label: t('Experience', 'অভিজ্ঞতা') },
     { href: '#contact', label: t('Contact', 'যোগাযোগ') },
   ];
 
+  const closeMenu = () => setIsOpen(false);
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 bg-background/70 backdrop-blur-md border-b border-surface-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 font-bold text-lg text-white">
-          <Compass className="text-primary-500" />
-          <span>Arian Islam Nirob</span>
-          <span className="text-xs text-accent-cyan bg-surface px-2 py-0.5 rounded border border-surface-border">
-            CrypticX
-          </span>
+    <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/50 backdrop-blur-xl">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
+
+        {/* Logo */}
+        <Link
+          href="/"
+          onClick={closeMenu}
+          className="group flex min-w-0 items-center gap-2"
+        >
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-indigo-400/30 bg-indigo-500/10">
+            <Sparkles
+              size={18}
+              className="text-indigo-300 transition group-hover:rotate-12"
+            />
+          </div>
+
+          <div className="min-w-0">
+            <div className="truncate text-sm font-bold text-white sm:text-base">
+              Aryan Islam Nirob
+            </div>
+            <div className="text-[10px] font-medium tracking-[0.25em] text-indigo-300">
+              CRYPTICX
+            </div>
+          </div>
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-6">
+        {/* Desktop */}
+        <nav className="hidden items-center gap-5 lg:flex">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="text-sm text-gray-300 hover:text-white transition-colors"
+              className="whitespace-nowrap text-sm text-gray-300 transition hover:text-white"
             >
               {link.label}
             </a>
           ))}
+
           <LanguageSwitcher />
         </nav>
 
-        {/* Mobile Toggle */}
-        <div className="flex md:hidden items-center gap-3">
+        {/* Mobile */}
+        <div className="flex items-center gap-2 lg:hidden">
           <LanguageSwitcher />
+
           <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="p-2 text-gray-300 hover:text-white"
+            type="button"
+            aria-label={isOpen ? 'Close menu' : 'Open menu'}
+            onClick={() => setIsOpen((value) => !value)}
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-gray-200 transition hover:bg-white/10"
           >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
+            {isOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile menu */}
       {isOpen && (
-        <div className="md:hidden bg-surface border-b border-surface-border px-4 pt-2 pb-6 flex flex-col gap-4">
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={() => setIsOpen(false)}
-              className="text-base text-gray-300 hover:text-white py-1"
-            >
-              {link.label}
-            </a>
-          ))}
+        <div className="border-t border-white/10 bg-black/90 px-4 py-4 backdrop-blur-2xl lg:hidden">
+          <nav className="mx-auto flex max-w-7xl flex-col gap-1">
+            {navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={closeMenu}
+                className="rounded-xl px-4 py-3 text-sm text-gray-300 transition hover:bg-white/5 hover:text-white"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
         </div>
       )}
     </header>
