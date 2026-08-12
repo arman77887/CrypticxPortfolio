@@ -152,6 +152,12 @@ const demoJourney: JourneyItem[] = [
 ];
 
 export default function Home() {
+  const [contactName, setContactName] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactMessage, setContactMessage] = useState('');
+  const [contactLoading, setContactLoading] = useState(false);
+  const [contactStatus, setContactStatus] = useState('');
+
   const [cyberModalOpen, setCyberModalOpen] = useState(false);
   const [cyberPassword, setCyberPassword] = useState('');
   const [cyberLoading, setCyberLoading] = useState(false);
@@ -220,31 +226,31 @@ export default function Home() {
               {t('Creative Identity · CrypticX', 'সৃজনশীল পরিচয় · CrypticX')}
             </div>
 
-            <div className="flex items-center gap-4 sm:gap-6">
+            <div className="flex items-center gap-4 sm:gap-5">
               <div className="relative shrink-0">
-                <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 opacity-80 blur-md" />
+                <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 opacity-70 blur-md" />
                 <img
                   src="/images/profile.jpg"
                   alt="Aryan Islam Nirob"
-                  className="relative h-16 w-16 rounded-full border-2 border-white/20 object-cover shadow-2xl sm:h-24 sm:w-24 lg:h-28 lg:w-28"
+                  className="relative h-14 w-14 rounded-full border-2 border-white/20 object-cover shadow-2xl sm:h-20 sm:w-20 lg:h-24 lg:w-24"
                 />
               </div>
 
-              <h1 className="text-5xl font-black tracking-tight sm:text-6xl lg:text-7xl">
-                Aryan
-                <span className="block bg-gradient-to-r from-indigo-300 via-purple-300 to-cyan-300 bg-clip-text text-transparent">
-                  Islam Nirob
-                </span>
-              </h1>
+              <div className="min-w-0">
+                <h1 className="whitespace-nowrap text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
+                  Aryan Islam Nirob
+                </h1>
+
+                <p className="mt-1 text-base font-bold tracking-[0.35em] text-transparent bg-gradient-to-r from-indigo-300 via-purple-300 to-cyan-300 bg-clip-text sm:text-lg">
+                  CrypticX
+                </p>
+              </div>
             </div>
 
-            <p className="mt-4 text-2xl font-bold text-gray-300 sm:text-3xl">
-            </p>
-
-            <p className="mt-6 max-w-2xl text-base leading-8 text-gray-300 sm:text-lg">
+            <p className="mt-5 text-base font-medium text-gray-300 sm:text-lg">
               {t(
-                'Welcome to my personal digital space — a collection of my story, memories, experiences, photography and the creative world behind CrypticX.',
-                'আমার ব্যক্তিগত ডিজিটাল জগতে স্বাগতম — এখানে থাকবে আমার গল্প, স্মৃতি, অভিজ্ঞতা, ছবি এবং CrypticX-এর পেছনের সৃজনশীল জগত।'
+                'Welcome to my personal digital space.',
+                'আমার ব্যক্তিগত ডিজিটাল জগতে স্বাগতম।'
               )}
             </p>
 
@@ -676,7 +682,52 @@ export default function Home() {
 
           <form
             className="space-y-5"
-            onSubmit={(e) => e.preventDefault()}
+            onSubmit={async (e) => {
+              e.preventDefault();
+              setContactLoading(true);
+              setContactStatus('');
+
+              try {
+                const response = await fetch('/api/contact', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    name: contactName,
+                    email: contactEmail,
+                    message: contactMessage,
+                  }),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                  throw new Error(data.error || 'Failed to send message.');
+                }
+
+                setContactStatus(
+                  t(
+                    'Message sent successfully!',
+                    'আপনার বার্তা সফলভাবে পাঠানো হয়েছে!'
+                  )
+                );
+
+                setContactName('');
+                setContactEmail('');
+                setContactMessage('');
+              } catch (error) {
+                console.error(error);
+                setContactStatus(
+                  t(
+                    'Failed to send message. Please try again.',
+                    'বার্তা পাঠানো যায়নি। আবার চেষ্টা করুন।'
+                  )
+                );
+              } finally {
+                setContactLoading(false);
+              }
+            }}
           >
             <div>
               <label className="mb-2 block text-sm text-gray-400">
@@ -686,6 +737,8 @@ export default function Home() {
               <input
                 type="text"
                 required
+                value={contactName}
+                onChange={(e) => setContactName(e.target.value)}
                 placeholder={t('Your name', 'আপনার নাম')}
                 className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none transition placeholder:text-gray-600 focus:border-indigo-400/50"
               />
@@ -699,6 +752,8 @@ export default function Home() {
               <input
                 type="email"
                 required
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)}
                 placeholder="you@example.com"
                 className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none transition placeholder:text-gray-600 focus:border-indigo-400/50"
               />
@@ -712,6 +767,8 @@ export default function Home() {
               <textarea
                 rows={5}
                 required
+                value={contactMessage}
+                onChange={(e) => setContactMessage(e.target.value)}
                 placeholder={t('Write your message...', 'আপনার বার্তা লিখুন...')}
                 className="w-full resize-none rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none transition placeholder:text-gray-600 focus:border-indigo-400/50"
               />
@@ -719,11 +776,20 @@ export default function Home() {
 
             <button
               type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 py-3.5 font-semibold transition hover:bg-indigo-500"
+              disabled={contactLoading}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 py-3.5 font-semibold transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <Send size={18} />
-              {t('Send Message', 'বার্তা পাঠান')}
+              {contactLoading
+                ? t('Sending...', 'পাঠানো হচ্ছে...')
+                : t('Send Message', 'বার্তা পাঠান')}
             </button>
+
+            {contactStatus && (
+              <p className="text-center text-sm text-indigo-300">
+                {contactStatus}
+              </p>
+            )}
           </form>
 
           <div className="mt-8 flex justify-center gap-3">
