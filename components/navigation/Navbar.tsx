@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
-import { Menu, X, Sparkles } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 export default function Navbar() {
   const { t } = useLanguage();
@@ -32,10 +32,11 @@ export default function Navbar() {
           onClick={closeMenu}
           className="group flex min-w-0 items-center gap-2"
         >
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-indigo-400/30 bg-indigo-500/10">
-            <Sparkles
-              size={18}
-              className="text-indigo-300 transition group-hover:rotate-12"
+          <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-xl border border-indigo-400/30 bg-indigo-500/10 shadow-lg shadow-indigo-500/10 transition group-hover:scale-105">
+            <img
+              src="/images/profile.jpg"
+              alt="Aryan Islam Nirob"
+              className="h-full w-full object-cover"
             />
           </div>
 

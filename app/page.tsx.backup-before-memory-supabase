@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { useState } from 'react';
 import Navbar from '@/components/navigation/Navbar';
 import ThreeBackground from '@/components/3d/ThreeBackground';
 import Hero3D from '@/components/3d/Hero3D';
@@ -45,9 +44,21 @@ const demoSliderImages = [
   '/images/photo6.jpg',
 ];
 
-const demoMemories: Memory[] = [];
-
-
+const demoMemories: Memory[] = [
+  {
+    id: '1',
+    title_en: 'Beginning of Coding',
+    title_bn: 'কোডিংয়ের শুরু',
+    description_en:
+      'A personal milestone from the early days of exploring technology and digital creation.',
+    description_bn:
+      'প্রযুক্তি ও ডিজিটাল জগতের সাথে পথচলার শুরুর দিকের একটি গুরুত্বপূর্ণ স্মৃতি।',
+    image_url:
+      'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1200',
+    category: 'CrypticX',
+    memory_date: '2023-05-12',
+  },
+];
 
 const demoJourney: JourneyItem[] = [
   {
@@ -141,29 +152,7 @@ const demoJourney: JourneyItem[] = [
 ];
 
 export default function Home() {
-  const supabase = createClient();
-
-  const [memories, setMemories] = useState<Memory[]>([]);
   const [contactName, setContactName] = useState('');
-
-  useEffect(() => {
-    const loadMemories = async () => {
-      const { data, error } = await supabase
-        .from('memories')
-        .select('*')
-        .order('memory_date', { ascending: false })
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Failed to load memories:', error);
-        return;
-      }
-
-      setMemories((data || []) as Memory[]);
-    };
-
-    loadMemories();
-  }, []);
   const [contactEmail, setContactEmail] = useState('');
   const [contactMessage, setContactMessage] = useState('');
   const [contactLoading, setContactLoading] = useState(false);
@@ -433,7 +422,7 @@ export default function Home() {
           </p>
         </div>
 
-        <MemoryGallery memories={memories} />
+        <MemoryGallery memories={demoMemories} />
       </section>
 
       {/* ALBUMS */}
