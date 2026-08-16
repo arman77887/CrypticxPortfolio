@@ -445,8 +445,8 @@ export default function AdminAlbums() {
 
                 <ImageUploader
                   bucket="portfolio-albums"
-                  value={form.cover_image}
-                  onChange={(url) =>
+                  currentImageUrl={form.cover_image}
+                  onUploadComplete={(url) =>
                     updateField('cover_image', url)
                   }
                 />
