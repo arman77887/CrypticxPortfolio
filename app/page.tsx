@@ -7,9 +7,10 @@ import ThreeBackground from '@/components/3d/ThreeBackground';
 import Hero3D from '@/components/3d/Hero3D';
 import AutoPhotoSlider from '@/components/ui/AutoPhotoSlider';
 import MemoryGallery from '@/components/gallery/MemoryGallery';
+import AlbumViewer3D from '@/components/3d/AlbumViewer3D';
 import JourneyTimeline from '@/components/timeline/JourneyTimeline';
 import { useLanguage } from '@/context/LanguageContext';
-import { Memory, JourneyItem } from '@/types/database';
+import { Memory, JourneyItem, Album, AlbumPhoto } from '@/types/database';
 import {
   ArrowDown,
   ArrowUp,
@@ -144,6 +145,9 @@ export default function Home() {
   const supabase = createClient();
 
   const [memories, setMemories] = useState<Memory[]>([]);
+  const [albums, setAlbums] = useState<Album[]>([]);
+  const [albumPhotos, setAlbumPhotos] = useState<AlbumPhoto[]>([]);
+  const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
   const [contactName, setContactName] = useState('');
 
   useEffect(() => {
@@ -163,6 +167,22 @@ export default function Home() {
     };
 
     loadMemories();
+
+    const loadAlbums = async () => {
+      const { data, error } = await supabase
+        .from('albums')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Failed to load albums:', error);
+        return;
+      }
+
+      setAlbums((data || []) as Album[]);
+    };
+
+    loadAlbums();
   }, []);
   const [contactEmail, setContactEmail] = useState('');
   const [contactMessage, setContactMessage] = useState('');
@@ -178,6 +198,28 @@ export default function Home() {
     title: string;
     description: string;
   } | null>(null);
+
+  const openAlbum = async (album: Album) => {
+    const { data, error } = await supabase
+      .from('album_photos')
+      .select('*')
+      .eq('album_id', album.id)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Failed to load album photos:', error);
+      return;
+    }
+
+    setAlbumPhotos((data || []) as AlbumPhoto[]);
+    setSelectedAlbum(album);
+  };
+
+  const closeAlbum = () => {
+    setSelectedAlbum(null);
+    setAlbumPhotos([]);
+  };
 
   const unlockCyberSecurity = async () => {
     setCyberError('');
@@ -218,7 +260,7 @@ export default function Home() {
       setCyberLoading(false);
     }
   };
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [showTop, setShowTop] = useState(false);
 
   return (
@@ -437,25 +479,83 @@ export default function Home() {
       </section>
 
       {/* ALBUMS */}
-      <section id="albums" className="relative mx-auto max-w-6xl px-4 py-24 sm:px-6">
-        <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-8 text-center backdrop-blur-xl sm:p-12">
-          <Camera className="mx-auto mb-5 text-indigo-300" size={38} />
+      <section id="albums" className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6">
+        <div className="mb-10 text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-indigo-300">
+            {t('Personal Archive', 'ব্যক্তিগত আর্কাইভ')}
+          </p>
 
-          <h2 className="text-4xl font-black">
+          <h2 className="mt-2 text-4xl font-black">
             {t('Photo Albums', 'ছবির অ্যালবাম')}
           </h2>
 
           <p className="mx-auto mt-4 max-w-2xl leading-8 text-gray-400">
             {t(
-              'Personal albums will live here — travel, life, projects, special moments and memories.',
-              'এখানে থাকবে আমার ব্যক্তিগত অ্যালবাম — ভ্রমণ, জীবন, প্রজেক্ট, বিশেষ মুহূর্ত এবং স্মৃতি।'
+              'Travel, life, projects, special moments and memories.',
+              'ভ্রমণ, জীবন, প্রজেক্ট, বিশেষ মুহূর্ত এবং স্মৃতির সংগ্রহ।'
             )}
           </p>
-
-          <div className="mt-8 inline-flex rounded-2xl border border-indigo-400/20 bg-indigo-500/10 px-5 py-3 text-sm text-indigo-200">
-            {t('Albums will be connected to Supabase later.', 'পরে Supabase-এর সাথে অ্যালবামগুলো যুক্ত করা হবে।')}
-          </div>
         </div>
+
+        {albums.length === 0 ? (
+          <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-12 text-center backdrop-blur-xl">
+            <Camera className="mx-auto mb-4 text-indigo-300" size={38} />
+
+            <h3 className="text-xl font-bold">
+              {t('No albums yet', 'এখনও কোনো অ্যালবাম নেই')}
+            </h3>
+
+            <p className="mt-2 text-gray-500">
+              {t(
+                'Albums will appear here when they are published.',
+                'অ্যালবাম প্রকাশ করলে এখানে দেখা যাবে।'
+              )}
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {albums.map((album) => (
+              <button
+                key={album.id}
+                type="button"
+                onClick={() => openAlbum(album)}
+                className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] text-left backdrop-blur-xl transition hover:-translate-y-1 hover:border-indigo-400/30 hover:bg-white/[0.07]"
+              >
+                <div className="aspect-video overflow-hidden bg-black/30">
+                  <img
+                    src={album.cover_image}
+                    alt={album.title_en}
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  />
+                </div>
+
+                <div className="p-5">
+                  <h3 className="text-xl font-bold">
+                    {language === 'bn'
+                      ? album.title_bn
+                      : album.title_en}
+                  </h3>
+
+                  <p className="mt-2 line-clamp-2 text-sm leading-6 text-gray-400">
+                    {language === 'bn'
+                      ? album.description_bn
+                      : album.description_en}
+                  </p>
+
+                  <div className="mt-4 text-sm font-semibold text-indigo-300">
+                    {t('View Album →', 'অ্যালবাম দেখুন →')}
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+
+        <AlbumViewer3D
+          album={selectedAlbum}
+          photos={albumPhotos}
+          onClose={closeAlbum}
+        />
       </section>
 
       {/* EXPERIENCE */}
