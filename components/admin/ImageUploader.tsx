@@ -6,8 +6,12 @@ import { Upload, X, Loader2, Image as ImageIcon } from 'lucide-react';
 
 interface ImageUploaderProps {
   bucket: string;
-  onUploadComplete: (url: string) => void;
+  onUploadComplete?: (url: string) => void;
   currentImageUrl?: string;
+
+  // Compatibility with album/project forms
+  value?: string;
+  onChange?: (url: string) => void;
 }
 
 function getStoragePath(url: string, bucket: string): string | null {
@@ -30,18 +34,24 @@ export default function ImageUploader({
   bucket,
   onUploadComplete,
   currentImageUrl,
+  value,
+  onChange,
 }: ImageUploaderProps) {
+  const handleUrlChange = (url: string) => {
+    onUploadComplete?.(url);
+    onChange?.(url);
+  };
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [preview, setPreview] = useState<string | null>(
-    currentImageUrl || null
+    value || currentImageUrl || null
   );
 
   const supabase = createClient();
 
   useEffect(() => {
-    setPreview(currentImageUrl || null);
-  }, [currentImageUrl]);
+    setPreview(value || currentImageUrl || null);
+  }, [value, currentImageUrl]);
 
   const handleFileChange = async (
     e: React.ChangeEvent<HTMLInputElement>
@@ -85,7 +95,7 @@ export default function ImageUploader({
         .getPublicUrl(fileName);
 
       setPreview(data.publicUrl);
-      onUploadComplete(data.publicUrl);
+      handleUrlChange(data.publicUrl);
     } catch (error) {
       console.error('Image upload error:', error);
       alert(
@@ -124,7 +134,7 @@ export default function ImageUploader({
       }
 
       setPreview(null);
-      onUploadComplete('');
+      handleUrlChange('');
     } catch (error) {
       console.error('Image delete error:', error);
       alert(
