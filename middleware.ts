@@ -16,38 +16,56 @@ export async function middleware(request: NextRequest) {
         get(name: string) {
           return request.cookies.get(name)?.value;
         },
+
         set(name: string, value: string, options: CookieOptions) {
           request.cookies.set({ name, value, ...options });
+
           response = NextResponse.next({
             request: {
               headers: request.headers,
             },
           });
+
           response.cookies.set({ name, value, ...options });
         },
+
         remove(name: string, options: CookieOptions) {
           request.cookies.set({ name, value: '', ...options });
+
           response = NextResponse.next({
             request: {
               headers: request.headers,
             },
           });
-          response.cookies.set({ name, value: '', ...options });
+
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+          });
         },
       },
     }
   );
 
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
-  // Protect Admin Dashboard Routes
-  if (request.nextUrl.pathname.startsWith('/admin/dashboard') && !session) {
-    return NextResponse.redirect(new URL('/admin/login', request.url));
+  const pathname = request.nextUrl.pathname;
+
+  // Protect ALL admin pages except login
+  if (pathname.startsWith('/admin') && pathname !== '/admin/login' && !session) {
+    return NextResponse.redirect(
+      new URL('/admin/login', request.url)
+    );
   }
 
-  // Redirect authenticated user away from login page
-  if (request.nextUrl.pathname === '/admin/login' && session) {
-    return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+  // Logged-in users should not see login
+  if (pathname === '/admin/login' && session) {
+    return NextResponse.redirect(
+      new URL('/admin/dashboard', request.url)
+    );
   }
 
   return response;
